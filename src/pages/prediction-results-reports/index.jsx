@@ -115,7 +115,7 @@ const PredictionResultsReports = () => {
       shortName: 'MSIT',
       location: 'Delhi',
       branch: 'Electronics & Communication',
-      image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=200&fit=crop',
+      image: 'https://www.getadmissioninfo.com/uploads/topics/maharaja-surajmal-institute-of-technology-moodle-msit-delhi.jpg',
       logo: 'https://images.unsplash.com/photo-1599305445671-ac291c95aaa9?w=80&h=80&fit=crop',
       admissionProbability: 58,
       previousCutoff: 8500,
