@@ -9,28 +9,19 @@ const ChatbotWidget = () => {
     {
       id: 1,
       type: 'bot',
-      message: "Hi! I'm your admission assistant. How can I help you today?",
+      message: 'Hi! I\'m your admission assistant. How can I help you today?',
       timestamp: new Date()
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  const fetchBotResponse = async (question) => {
-    try {
-      const res = await fetch('http://localhost:5000/chatbees-proxy', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ message: question })
-      });
-      const data = await res.json();
-      return data?.choices?.[0]?.message?.content || "Sorry, couldn't generate answer.";
-    } catch (e) {
-      return "Sorry, I couldn't reach out.";
-    }
-  };
+  const quickQuestions = [
+    'What are my chances for IIT Delhi?',
+    'Show me colleges in Bangalore',
+    'How to calculate cutoff ranks?',
+    'What documents do I need?'
+  ];
 
   const handleSendMessage = async (message = inputMessage) => {
     if (!message?.trim()) return;
@@ -46,16 +37,29 @@ const ChatbotWidget = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    const botMsgContent = await fetchBotResponse(message?.trim());
+    // Simulate bot response
+    setTimeout(() => {
+      const botResponse = {
+        id: Date.now() + 1,
+        type: 'bot',
+        message: getBotResponse(message?.trim()),
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, botResponse]);
+      setIsTyping(false);
+    }, 1500);
+  };
 
-    const botResponse = {
-      id: Date.now() + 1,
-      type: 'bot',
-      message: botMsgContent,
-      timestamp: new Date()
+  const getBotResponse = (userMessage) => {
+    const responses = {
+      'what are my chances for iit delhi?': 'Based on your JEE Main rank of 2,450, you have a good chance for IIT Delhi in branches like Civil Engineering or Chemical Engineering. Would you like me to show you detailed cutoff analysis?',
+      'show me colleges in bangalore': 'Here are some top engineering colleges in Bangalore that match your profile:\n• RV College of Engineering\n• BMS College of Engineering\n• PES University\n• MS Ramaiah Institute of Technology\n\nWould you like detailed information about any of these?',
+      'how to calculate cutoff ranks?': 'Cutoff ranks are calculated based on:\n1. Previous year admission data\n2. Number of seats available\n3. Category-wise reservations\n4. Difficulty level of the exam\n\nOur prediction engine uses 5+ years of historical data for accurate predictions.',
+      'what documents do i need?': 'For counseling, you\'ll typically need:\n• Rank card/Score card\n• 10th & 12th mark sheets\n• Category certificate (if applicable)\n• Income certificate\n• Domicile certificate\n• Passport size photos\n• Aadhar card\n\nKeep both originals and photocopies ready!'
     };
-    setMessages(prev => [...prev, botResponse]);
-    setIsTyping(false);
+
+    return responses?.[userMessage?.toLowerCase()] || 
+           'I understand you\'re asking about college admissions. Let me connect you with more specific information. You can also use our prediction engine for personalized recommendations!';
   };
 
   const handleKeyPress = (e) => {
@@ -77,6 +81,7 @@ const ChatbotWidget = () => {
           <Icon name={isOpen ? "X" : "MessageCircle"} size={24} />
         </Button>
       </div>
+      {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-80 h-96 bg-card border border-border rounded-xl shadow-modal z-100 flex flex-col">
           {/* Header */}
@@ -100,6 +105,7 @@ const ChatbotWidget = () => {
               <Icon name="Minimize2" size={16} />
             </Button>
           </div>
+
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages?.map((message) => (
@@ -108,7 +114,9 @@ const ChatbotWidget = () => {
                 className={`flex ${message?.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] p-3 rounded-lg text-sm ${message?.type === 'user' ?'bg-primary text-primary-foreground' :'bg-muted text-foreground'}`}
+                  className={`max-w-[80%] p-3 rounded-lg text-sm ${
+                    message?.type === 'user' ?'bg-primary text-primary-foreground' :'bg-muted text-foreground'
+                  }`}
                 >
                   <p className="whitespace-pre-line">{message?.message}</p>
                   <p className={`text-xs mt-1 opacity-70`}>
@@ -120,6 +128,7 @@ const ChatbotWidget = () => {
                 </div>
               </div>
             ))}
+
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-muted p-3 rounded-lg">
@@ -132,6 +141,25 @@ const ChatbotWidget = () => {
               </div>
             )}
           </div>
+
+          {/* Quick Questions */}
+          {messages?.length === 1 && (
+            <div className="p-4 border-t border-border">
+              <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
+              <div className="space-y-1">
+                {quickQuestions?.slice(0, 2)?.map((question, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSendMessage(question)}
+                    className="w-full text-left text-xs p-2 bg-muted hover:bg-muted/80 rounded text-foreground transition-smooth"
+                  >
+                    {question}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Input */}
           <div className="p-4 border-t border-border">
             <div className="flex space-x-2">
