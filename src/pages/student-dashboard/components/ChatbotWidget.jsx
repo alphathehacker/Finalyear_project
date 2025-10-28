@@ -3,26 +3,44 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
+// Store your ChatBees API key securely; demo only!
+const CHATBEES_API_KEY = "MDMtMDAwMDAwMDAtMDAwMDAxLTRmMWJmNzA3LWQyNDQtYjgzOC0yM2I2LTc1ZmZmN2E1ODU3Mw==";
+
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
       type: 'bot',
-      message: 'Hi! I\'m your admission assistant. How can I help you today?',
+      message: "Hi! I'm your admission assistant. How can I help you today?",
       timestamp: new Date()
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  const quickQuestions = [
-    'What are my chances for IIT Delhi?',
-    'Show me colleges in Bangalore',
-    'How to calculate cutoff ranks?',
-    'What documents do I need?'
-  ];
+  // Function to get real-time response from ChatBees API
+  const fetchBotResponse = async (question) => {
+    try {
+      const res = await fetch('https://api.chatbees.ai/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CHATBEES_API_KEY}`
+        },
+        body: JSON.stringify({
+          messages: [{ role: 'user', content: question }]
+        })
+      });
+      const data = await res.json();
+      // Adjust property as per your API response
+      return data?.choices?.[0]?.message?.content || "Sorry, couldn't generate answer.";
+    } catch (e) {
+      return "Sorry, I couldn't reach out.";
+    }
+  };
 
+  // Send the message, call API, and display bot response
   const handleSendMessage = async (message = inputMessage) => {
     if (!message?.trim()) return;
 
@@ -37,29 +55,17 @@ const ChatbotWidget = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
-      const botResponse = {
-        id: Date.now() + 1,
-        type: 'bot',
-        message: getBotResponse(message?.trim()),
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, botResponse]);
-      setIsTyping(false);
-    }, 1500);
-  };
+    // Get bot's response from ChatBees API
+    const botMsgContent = await fetchBotResponse(message?.trim());
 
-  const getBotResponse = (userMessage) => {
-    const responses = {
-      'what are my chances for iit delhi?': 'Based on your JEE Main rank of 2,450, you have a good chance for IIT Delhi in branches like Civil Engineering or Chemical Engineering. Would you like me to show you detailed cutoff analysis?',
-      'show me colleges in bangalore': 'Here are some top engineering colleges in Bangalore that match your profile:\n• RV College of Engineering\n• BMS College of Engineering\n• PES University\n• MS Ramaiah Institute of Technology\n\nWould you like detailed information about any of these?',
-      'how to calculate cutoff ranks?': 'Cutoff ranks are calculated based on:\n1. Previous year admission data\n2. Number of seats available\n3. Category-wise reservations\n4. Difficulty level of the exam\n\nOur prediction engine uses 5+ years of historical data for accurate predictions.',
-      'what documents do i need?': 'For counseling, you\'ll typically need:\n• Rank card/Score card\n• 10th & 12th mark sheets\n• Category certificate (if applicable)\n• Income certificate\n• Domicile certificate\n• Passport size photos\n• Aadhar card\n\nKeep both originals and photocopies ready!'
+    const botResponse = {
+      id: Date.now() + 1,
+      type: 'bot',
+      message: botMsgContent,
+      timestamp: new Date()
     };
-
-    return responses?.[userMessage?.toLowerCase()] || 
-           'I understand you\'re asking about college admissions. Let me connect you with more specific information. You can also use our prediction engine for personalized recommendations!';
+    setMessages(prev => [...prev, botResponse]);
+    setIsTyping(false);
   };
 
   const handleKeyPress = (e) => {
@@ -114,9 +120,7 @@ const ChatbotWidget = () => {
                 className={`flex ${message?.type === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div
-                  className={`max-w-[80%] p-3 rounded-lg text-sm ${
-                    message?.type === 'user' ?'bg-primary text-primary-foreground' :'bg-muted text-foreground'
-                  }`}
+                  className={`max-w-[80%] p-3 rounded-lg text-sm ${message?.type === 'user' ?'bg-primary text-primary-foreground' :'bg-muted text-foreground'}`}
                 >
                   <p className="whitespace-pre-line">{message?.message}</p>
                   <p className={`text-xs mt-1 opacity-70`}>
@@ -141,24 +145,6 @@ const ChatbotWidget = () => {
               </div>
             )}
           </div>
-
-          {/* Quick Questions */}
-          {messages?.length === 1 && (
-            <div className="p-4 border-t border-border">
-              <p className="text-xs text-muted-foreground mb-2">Quick questions:</p>
-              <div className="space-y-1">
-                {quickQuestions?.slice(0, 2)?.map((question, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSendMessage(question)}
-                    className="w-full text-left text-xs p-2 bg-muted hover:bg-muted/80 rounded text-foreground transition-smooth"
-                  >
-                    {question}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
 
           {/* Input */}
           <div className="p-4 border-t border-border">
