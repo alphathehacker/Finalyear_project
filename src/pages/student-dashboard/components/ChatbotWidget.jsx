@@ -3,8 +3,10 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
-// Store your ChatBees API key securely; demo only!
+// Replace with your real ChatBees API key and collection name
 const CHATBEES_API_KEY = "MDMtMDAwMDAwMDAtMDAwMDAxLTRmMWJmNzA3LWQyNDQtYjgzOC0yM2I2LTc1ZmZmN2E1ODU3Mw==";
+const ACCOUNT_ID = "X0LZQYK7";
+const COLLECTION_NAME = "YOUR_COLLECTION_NAME"; // Use collection name you set or omit if not required
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -19,7 +21,6 @@ const ChatbotWidget = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
 
-  // Function to get real-time response from ChatBees API
   const fetchBotResponse = async (question) => {
     try {
       const res = await fetch('https://api.chatbees.ai/v1/chat/completions', {
@@ -29,18 +30,18 @@ const ChatbotWidget = () => {
           'Authorization': `Bearer ${CHATBEES_API_KEY}`
         },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: question }]
+          messages: [{ role: 'user', content: question }],
+          account_id: ACCOUNT_ID,
+          collection: COLLECTION_NAME // Optional, include if you have a collection
         })
       });
       const data = await res.json();
-      // Adjust property as per your API response
       return data?.choices?.[0]?.message?.content || "Sorry, couldn't generate answer.";
     } catch (e) {
-      return "Sorry, I couldn't reach out.";
+      return "Sorry, I couldn't reach ChatBees API.";
     }
   };
 
-  // Send the message, call API, and display bot response
   const handleSendMessage = async (message = inputMessage) => {
     if (!message?.trim()) return;
 
@@ -55,7 +56,6 @@ const ChatbotWidget = () => {
     setInputMessage('');
     setIsTyping(true);
 
-    // Get bot's response from ChatBees API
     const botMsgContent = await fetchBotResponse(message?.trim());
 
     const botResponse = {
@@ -87,7 +87,6 @@ const ChatbotWidget = () => {
           <Icon name={isOpen ? "X" : "MessageCircle"} size={24} />
         </Button>
       </div>
-      {/* Chat Window */}
       {isOpen && (
         <div className="fixed bottom-24 right-6 w-80 h-96 bg-card border border-border rounded-xl shadow-modal z-100 flex flex-col">
           {/* Header */}
@@ -111,7 +110,6 @@ const ChatbotWidget = () => {
               <Icon name="Minimize2" size={16} />
             </Button>
           </div>
-
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages?.map((message) => (
@@ -145,7 +143,6 @@ const ChatbotWidget = () => {
               </div>
             )}
           </div>
-
           {/* Input */}
           <div className="p-4 border-t border-border">
             <div className="flex space-x-2">
