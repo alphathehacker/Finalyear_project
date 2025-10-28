@@ -3,10 +3,10 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
-// Replace with your real ChatBees API key and collection name
-const CHATBEES_API_KEY = "MDMtMDAwMDAwMDAtMDAwMDAxLTRmMWJmNzA3LWQyNDQtYjgzOC0yM2I2LTc1ZmZmN2E1ODU3Mw==";
+// ======= CONFIGURE YOUR API KEY =======
+const CHATBEES_API_KEY = "MDMtMDAwMDAwMDAtMDAwMDAxLTUyYTRkYmEwLTU5ZWEtZDAzNi01NmRlLTNlYmM4MzZiNzVmZg=="; // Replace with your real API key
 const ACCOUNT_ID = "X0LZQYK7";
-const COLLECTION_NAME = "websitedata"; // Use collection name you set or omit if not required
+const COLLECTION_NAME = "websitedata"; // Taken from your ChatBees dashboard
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -30,15 +30,19 @@ const ChatbotWidget = () => {
           'Authorization': `Bearer ${CHATBEES_API_KEY}`
         },
         body: JSON.stringify({
-          messages: [{ role: 'user', content: question }],
           account_id: ACCOUNT_ID,
-          collection: COLLECTION_NAME // Optional, include if you have a collection
+          collection: COLLECTION_NAME,
+          messages: [{ role: 'user', content: question }]
         })
       });
       const data = await res.json();
+
+      // Optional: Console log for debugging, remove in production
+      // console.log("ChatBees API raw response:", data);
+
       return data?.choices?.[0]?.message?.content || "Sorry, couldn't generate answer.";
     } catch (e) {
-      return "Sorry, I couldn't reach ChatBees API.";
+      return "Sorry, I couldn't reach out.";
     }
   };
 
