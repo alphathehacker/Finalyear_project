@@ -6,7 +6,7 @@ import Input from '../../../components/ui/Input';
 // Replace with your real ChatBees API key and collection name
 const CHATBEES_API_KEY = "MDMtMDAwMDAwMDAtMDAwMDAxLTRmMWJmNzA3LWQyNDQtYjgzOC0yM2I2LTc1ZmZmN2E1ODU3Mw==";
 const ACCOUNT_ID = "X0LZQYK7";
-const COLLECTION_NAME = "YOUR_COLLECTION_NAME"; // Use collection name you set or omit if not required
+const COLLECTION_NAME = "websitedata"; // Use collection name you set or omit if not required
 
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
