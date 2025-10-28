@@ -3,11 +3,6 @@ import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Input from '../../../components/ui/Input';
 
-// ======= CONFIGURE YOUR API KEY =======
-const CHATBEES_API_KEY = "MDMtMDAwMDAwMDAtMDAwMDAxLTUyYTRkYmEwLTU5ZWEtZDAzNi01NmRlLTNlYmM4MzZiNzVmZg=="; // Replace with your real API key
-const ACCOUNT_ID = "X0LZQYK7";
-const COLLECTION_NAME = "websitedata"; // Taken from your ChatBees dashboard
-
 const ChatbotWidget = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -23,23 +18,14 @@ const ChatbotWidget = () => {
 
   const fetchBotResponse = async (question) => {
     try {
-      const res = await fetch('https://api.chatbees.ai/v1/chat/completions', {
+      const res = await fetch('http://localhost:5000/chatbees-proxy', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${CHATBEES_API_KEY}`
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          account_id: ACCOUNT_ID,
-          collection: COLLECTION_NAME,
-          messages: [{ role: 'user', content: question }]
-        })
+        body: JSON.stringify({ message: question })
       });
       const data = await res.json();
-
-      // Optional: Console log for debugging, remove in production
-      // console.log("ChatBees API raw response:", data);
-
       return data?.choices?.[0]?.message?.content || "Sorry, couldn't generate answer.";
     } catch (e) {
       return "Sorry, I couldn't reach out.";
@@ -134,7 +120,6 @@ const ChatbotWidget = () => {
                 </div>
               </div>
             ))}
-
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-muted p-3 rounded-lg">
